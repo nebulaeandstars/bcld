@@ -84,10 +84,10 @@ impl fmt::Display for BitBoardState
 
         for i in 1..=array.len() {
             if let Some(piece) = array[i - 1] {
-                tmp.push_str(&piece.to_string());
+                tmp.push_str(&format!("{} ", piece));
             }
             else {
-                tmp.push(' ');
+                tmp.push_str("  ");
             }
             if i % 8 == 0 {
                 out.insert_str(0, &format!("{}\n", tmp));
