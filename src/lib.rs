@@ -2,17 +2,11 @@ mod bitboard;
 mod board;
 mod piece;
 
-pub fn add(a: isize, b: isize) -> isize { a + b }
-pub fn run() { println!("Hello, world!") }
+use board::{BitBoardState, GameState};
 
-#[cfg(test)]
-mod tests
+pub fn run()
 {
-    use super::add;
+    let board = BitBoardState::start_of_game();
 
-    #[test]
-    fn test_add()
-    {
-        assert_eq!(add(2, 3), 5);
-    }
+    println!("{}", board);
 }

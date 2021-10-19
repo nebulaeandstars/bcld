@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt;
 
 use strum::IntoEnumIterator;
 
@@ -73,6 +74,32 @@ impl GameState for BitBoardState
     }
 }
 
+impl fmt::Display for BitBoardState
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
+    {
+        let array = self.as_piece_array();
+        let mut out = String::new();
+        let mut tmp = String::new();
+
+        for i in 1..=array.len() {
+            if let Some(piece) = array[i - 1] {
+                tmp.push_str(&piece.to_string());
+            }
+            else {
+                tmp.push(' ');
+            }
+            if i % 8 == 0 {
+                out.insert_str(0, &format!("{}\n", tmp));
+                tmp = String::new();
+            }
+        }
+
+        write!(f, "{}", out)
+    }
+}
+
+
 #[cfg(test)]
 mod tests
 {
@@ -126,5 +153,16 @@ mod tests
         assert_eq!(array[47], None);
         assert_eq!(array[30], None);
         assert_eq!(array[40], None);
+    }
+
+    #[test]
+    fn test_board_display()
+    {
+        let board = BitBoardState::start_of_game();
+        let target =
+            "rnbqkbnr\npppppppp\n        \n        \n        \n        \
+             \nPPPPPPPP\nRNBQKBNR\n";
+
+        assert_eq!(format!("{}", board), target.to_string())
     }
 }
