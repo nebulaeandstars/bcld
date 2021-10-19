@@ -64,16 +64,10 @@ mod tests
     fn test_piece_display()
     {
         assert_eq!(Piece { color: White, piece: Pawn }.to_string(), "P");
-        assert_eq!(Piece { color: Black, piece: Pawn }.to_string(), "p");
         assert_eq!(Piece { color: White, piece: Knight }.to_string(), "N");
-        assert_eq!(Piece { color: Black, piece: Knight }.to_string(), "n");
         assert_eq!(Piece { color: White, piece: Bishop }.to_string(), "B");
-        assert_eq!(Piece { color: Black, piece: Bishop }.to_string(), "b");
-        assert_eq!(Piece { color: White, piece: Rook }.to_string(), "R");
         assert_eq!(Piece { color: Black, piece: Rook }.to_string(), "r");
-        assert_eq!(Piece { color: White, piece: Queen }.to_string(), "Q");
         assert_eq!(Piece { color: Black, piece: Queen }.to_string(), "q");
-        assert_eq!(Piece { color: White, piece: King }.to_string(), "K");
         assert_eq!(Piece { color: Black, piece: King }.to_string(), "k");
     }
 }
