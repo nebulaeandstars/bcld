@@ -1,3 +1,7 @@
+mod bitboard;
+mod board;
+mod piece;
+
 pub fn add(a: isize, b: isize) -> isize { a + b }
 pub fn run() { println!("Hello, world!") }
 
