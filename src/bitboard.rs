@@ -90,7 +90,7 @@ impl BitBoard
             if bits & 1 == 1 {
                 pieces[i] = Some(piece);
             }
-            bits <<= 1;
+            bits >>= 1;
         }
 
         pieces
@@ -100,11 +100,7 @@ impl BitBoard
 #[cfg(test)]
 mod tests
 {
-    use std::str::FromStr;
-
-    use strum::IntoEnumIterator;
-
-    use crate::bitboard::{BitBoard, BitBoardType};
+    use crate::bitboard::BitBoard;
     use crate::piece::Color::*;
     use crate::piece::Piece;
     use crate::piece::PieceType::*;
