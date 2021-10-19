@@ -81,14 +81,14 @@ impl BitBoard
         BitBoard::new(bits)
     }
 
-    pub fn into_piece_array(&self, piece: Piece) -> [Option<Piece>; 64]
+    pub fn as_piece_array(&self, piece: Piece) -> [Option<Piece>; 64]
     {
         let mut pieces = [None; 64];
         let mut bits = self.bits;
 
-        for i in 0..64 {
+        for p in pieces.iter_mut() {
             if bits & 1 == 1 {
-                pieces[i] = Some(piece);
+                *p = Some(piece);
             }
             bits >>= 1;
         }
@@ -109,7 +109,7 @@ mod tests
     fn test_empty_bitboard_returns_no_pieces_in_array()
     {
         let array = BitBoard::empty()
-            .into_piece_array(Piece { color: White, piece: Pawn });
+            .as_piece_array(Piece { color: White, piece: Pawn });
 
         for piece in array.iter() {
             assert!(piece.is_none())
@@ -121,7 +121,7 @@ mod tests
     {
         let white_bishop = Piece { color: White, piece: Bishop };
 
-        let array = BitBoard::new(0b00100100).into_piece_array(white_bishop);
+        let array = BitBoard::new(0b00100100).as_piece_array(white_bishop);
 
         assert_eq!(array[2], Some(white_bishop));
         assert_eq!(array[5], Some(white_bishop));

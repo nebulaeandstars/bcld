@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::str::FromStr;
 
 use strum::IntoEnumIterator;
 
@@ -12,7 +11,7 @@ pub trait GameState
 {
     fn new() -> Self;
     fn start_of_game() -> Self;
-    fn into_piece_array(&self) -> [Option<Piece>; 64];
+    fn as_piece_array(&self) -> [Option<Piece>; 64];
 }
 
 /// A collection of BitBoards representing a full game state.
@@ -47,7 +46,7 @@ impl GameState for BitBoardState
         BitBoardState { state }
     }
 
-    fn into_piece_array(&self) -> [Option<Piece>; 64]
+    fn as_piece_array(&self) -> [Option<Piece>; 64]
     {
         let mut pieces: [Option<Piece>; 64] = [None; 64];
 
@@ -57,11 +56,11 @@ impl GameState for BitBoardState
                 | WhiteQueens | WhiteKings | BlackPawns | BlackKnights
                 | BlackBishops | BlackRooks | BlackQueens | BlackKings => {
                     bitboard
-                        .into_piece_array(bitboard_type.get_piece().unwrap())
+                        .as_piece_array(bitboard_type.get_piece().unwrap())
                         .iter()
                         .enumerate()
                         .for_each(|(i, piece)| {
-                            if let Some(_) = piece {
+                            if piece.is_some() {
                                 pieces[i] = *piece
                             }
                         });
@@ -98,7 +97,7 @@ mod tests
     #[test]
     fn test_into_piece_array()
     {
-        let array = BitBoardState::start_of_game().into_piece_array();
+        let array = BitBoardState::start_of_game().as_piece_array();
 
         let white_pawn = Piece::from_str("P").unwrap();
         let white_knight = Piece::from_str("N").unwrap();
