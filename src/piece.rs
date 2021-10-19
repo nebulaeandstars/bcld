@@ -20,7 +20,7 @@ enum PieceType
 }
 
 #[derive(PartialEq)]
-struct Piece
+pub struct Piece
 {
     color: Color,
     piece: PieceType,
