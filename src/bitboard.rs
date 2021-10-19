@@ -65,17 +65,17 @@ impl BitBoard
     {
         let bits: u64 = match bitboard_type {
             WhitePawns => 0b11111111 << 8,
-            WhiteKnights => 0b11111111 << (8 * 6),
-            WhiteBishops => 0b01000010,
-            WhiteRooks => 0b01000010 << (8 * 7),
-            WhiteQueens => 0b00100100,
-            WhiteKings => 0b00100100 << (8 * 7),
-            BlackPawns => 0b10000001,
-            BlackKnights => 0b10000001 << (8 * 7),
-            BlackBishops => 0b00010000,
-            BlackRooks => 0b00010000 << (8 * 7),
-            BlackQueens => 0b00001000,
-            BlackKings => 0b00001000 << (8 * 7),
+            WhiteKnights => 0b01000010,
+            WhiteBishops => 0b00100100,
+            WhiteRooks => 0b10000001,
+            WhiteQueens => 0b00001000,
+            WhiteKings => 0b00010000,
+            BlackPawns => 0b11111111 << (8 * 6),
+            BlackKnights => 0b01000010 << (8 * 7),
+            BlackBishops => 0b00100100 << (8 * 7),
+            BlackRooks => 0b10000001 << (8 * 7),
+            BlackQueens => 0b00001000 << (8 * 7),
+            BlackKings => 0b00010000 << (8 * 7),
         };
 
         BitBoard::new(bits)

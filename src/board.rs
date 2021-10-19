@@ -60,7 +60,7 @@ impl GameState for BitBoardState
                         .into_piece_array(bitboard_type.get_piece().unwrap())
                         .iter()
                         .enumerate()
-                        .map(|(i, piece)| {
+                        .for_each(|(i, piece)| {
                             if let Some(_) = piece {
                                 pieces[i] = *piece
                             }
