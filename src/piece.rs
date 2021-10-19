@@ -63,6 +63,19 @@ impl FromStr for Piece
     }
 }
 
+impl fmt::Display for Color
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
+    {
+        use Color::*;
+
+        write!(f, "{}", match &self {
+            White => "w",
+            Black => "b",
+        })
+    }
+}
+
 impl fmt::Display for PieceType
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
