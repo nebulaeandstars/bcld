@@ -24,6 +24,7 @@ pub enum BitBoardType
     BlackRooks,
     BlackQueens,
     BlackKings,
+    AllPieces,
 }
 
 impl BitBoardType
@@ -76,6 +77,7 @@ impl BitBoard
             BlackRooks => 0b10000001 << (8 * 7),
             BlackQueens => 0b00001000 << (8 * 7),
             BlackKings => 0b00010000 << (8 * 7),
+            AllPieces => 0xffff00000000ffff,
         };
 
         BitBoard::new(bits)
