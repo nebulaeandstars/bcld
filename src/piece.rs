@@ -1,15 +1,15 @@
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(PartialEq)]
-enum Color
+#[derive(Clone, Copy, PartialEq)]
+pub enum Color
 {
     White,
     Black,
 }
 
-#[derive(PartialEq)]
-enum PieceType
+#[derive(Clone, Copy, PartialEq)]
+pub enum PieceType
 {
     Pawn,
     Knight,
@@ -19,11 +19,11 @@ enum PieceType
     King,
 }
 
-#[derive(PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct Piece
 {
-    color: Color,
-    piece: PieceType,
+    pub color: Color,
+    pub piece: PieceType,
 }
 
 impl FromStr for Piece
