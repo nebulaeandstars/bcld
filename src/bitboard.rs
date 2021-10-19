@@ -19,6 +19,7 @@ pub enum BitBoardType
     BlackKings,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct BitBoard
 {
     board: u64,

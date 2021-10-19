@@ -47,5 +47,18 @@ impl GameState for BitBoardState
 #[cfg(test)]
 mod tests
 {
-    use super::BitBoardState;
+    use strum::IntoEnumIterator;
+
+    use super::{BitBoardState, GameState};
+    use crate::bitboard::{BitBoard, BitBoardType};
+
+    #[test]
+    fn test_start_of_game_state()
+    {
+        let state = BitBoardState::start_of_game().state;
+        for bitboard_type in BitBoardType::iter() {
+            let bitboard = state.get(&bitboard_type).unwrap();
+            assert_eq!(*bitboard, BitBoard::default_from_type(&bitboard_type))
+        }
+    }
 }
