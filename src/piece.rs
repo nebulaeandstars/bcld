@@ -1,4 +1,5 @@
 use std::fmt;
+use std::str::FromStr;
 
 #[derive(PartialEq)]
 enum Color
@@ -7,6 +8,7 @@ enum Color
     Black,
 }
 
+#[derive(PartialEq)]
 enum PieceType
 {
     Pawn,
@@ -17,10 +19,48 @@ enum PieceType
     King,
 }
 
+#[derive(PartialEq)]
 struct Piece
 {
     color: Color,
     piece: PieceType,
+}
+
+impl FromStr for Piece
+{
+    type Err = Box<dyn std::error::Error>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err>
+    {
+        use Color::*;
+        use PieceType::*;
+
+        if s.len() != 1 {
+            return Err(format!(
+                "Cannot parse Piece from str of length {}!",
+                s.len()
+            )
+            .into());
+        }
+        let c = s.chars().next().unwrap();
+
+        let color = match c.is_uppercase() {
+            true => White,
+            false => Black,
+        };
+
+        let piece: Result<PieceType, Self::Err> = match c.to_ascii_uppercase() {
+            'P' => Ok(Pawn),
+            'N' => Ok(Knight),
+            'B' => Ok(Bishop),
+            'R' => Ok(Rook),
+            'Q' => Ok(Queen),
+            'K' => Ok(King),
+            _ => Err(format!("Cannot parse Piece from char {}", c).into()),
+        };
+
+        Ok(Piece { color, piece: piece? })
+    }
 }
 
 impl fmt::Display for PieceType
@@ -53,9 +93,19 @@ impl fmt::Display for Piece
     }
 }
 
+impl fmt::Debug for Piece
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
+    {
+        write!(f, "{}", self.to_string())
+    }
+}
+
 #[cfg(test)]
 mod tests
 {
+    use std::str::FromStr;
+
     use super::Color::*;
     use super::Piece;
     use super::PieceType::*;
@@ -69,5 +119,34 @@ mod tests
         assert_eq!(Piece { color: Black, piece: Rook }.to_string(), "r");
         assert_eq!(Piece { color: Black, piece: Queen }.to_string(), "q");
         assert_eq!(Piece { color: Black, piece: King }.to_string(), "k");
+    }
+
+    #[test]
+    fn test_piece_from_string()
+    {
+        assert_eq!(Piece::from_str("p").unwrap(), Piece {
+            color: Black,
+            piece: Pawn,
+        });
+        assert_eq!(Piece::from_str("n").unwrap(), Piece {
+            color: Black,
+            piece: Knight,
+        });
+        assert_eq!(Piece::from_str("b").unwrap(), Piece {
+            color: Black,
+            piece: Bishop,
+        });
+        assert_eq!(Piece::from_str("R").unwrap(), Piece {
+            color: White,
+            piece: Rook,
+        });
+        assert_eq!(Piece::from_str("Q").unwrap(), Piece {
+            color: White,
+            piece: Queen,
+        });
+        assert_eq!(Piece::from_str("K").unwrap(), Piece {
+            color: White,
+            piece: King,
+        });
     }
 }
