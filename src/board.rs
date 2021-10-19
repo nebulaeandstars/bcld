@@ -116,7 +116,7 @@ mod tests
         assert_eq!(array[63], Some(black_rook));
         assert_eq!(array[56], Some(black_rook));
         assert_eq!(array[55], Some(black_pawn));
-        assert_eq!(array[47], Some(black_pawn));
+        assert_eq!(array[48], Some(black_pawn));
 
         assert_eq!(array[4], Some(white_king));
         assert_eq!(array[59], Some(black_queen));
@@ -124,7 +124,7 @@ mod tests
         assert_eq!(array[61], Some(black_bishop));
 
         assert_eq!(array[16], None);
-        assert_eq!(array[62], None);
+        assert_eq!(array[47], None);
         assert_eq!(array[30], None);
         assert_eq!(array[40], None);
     }
