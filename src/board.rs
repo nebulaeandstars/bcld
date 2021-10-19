@@ -1,7 +1,11 @@
-use crate::bitboard::BitBoard;
+use std::collections::HashMap;
+
+use strum::IntoEnumIterator;
+
+use crate::bitboard::{BitBoard, BitBoardType};
 
 /// A trait representing anything that can represent a full game state.
-pub trait Board
+pub trait GameState
 {
     fn new() -> Self;
     fn start_of_game() -> Self;
@@ -11,58 +15,32 @@ pub trait Board
 #[allow(dead_code)]
 pub struct BitBoardState
 {
-    white_pawns:   BitBoard,
-    black_pawns:   BitBoard,
-    white_knights: BitBoard,
-    black_knights: BitBoard,
-    white_bishops: BitBoard,
-    black_bishops: BitBoard,
-    white_rooks:   BitBoard,
-    black_rooks:   BitBoard,
-    white_queens:  BitBoard,
-    black_queens:  BitBoard,
-    white_kings:   BitBoard,
-    black_kings:   BitBoard,
+    state: HashMap<BitBoardType, BitBoard>,
 }
 
 impl BitBoardState {}
 
-impl Board for BitBoardState
+impl GameState for BitBoardState
 {
     fn new() -> Self
     {
-        BitBoardState {
-            white_pawns:   BitBoard::new(0),
-            black_pawns:   BitBoard::new(0),
-            white_knights: BitBoard::new(0),
-            black_knights: BitBoard::new(0),
-            white_bishops: BitBoard::new(0),
-            black_bishops: BitBoard::new(0),
-            white_rooks:   BitBoard::new(0),
-            black_rooks:   BitBoard::new(0),
-            white_queens:  BitBoard::new(0),
-            black_queens:  BitBoard::new(0),
-            white_kings:   BitBoard::new(0),
-            black_kings:   BitBoard::new(0),
+        let mut state = HashMap::new();
+        for bitboard_type in BitBoardType::iter() {
+            state.insert(bitboard_type, BitBoard::empty());
         }
+
+        BitBoardState { state }
     }
 
     fn start_of_game() -> Self
     {
-        BitBoardState {
-            white_pawns:   BitBoard::new(0b11111111 << (8 * 1)),
-            black_pawns:   BitBoard::new(0b11111111 << (8 * 6)),
-            white_knights: BitBoard::new(0b01000010 << (8 * 0)),
-            black_knights: BitBoard::new(0b01000010 << (8 * 7)),
-            white_bishops: BitBoard::new(0b00100100 << (8 * 0)),
-            black_bishops: BitBoard::new(0b00100100 << (8 * 7)),
-            white_rooks:   BitBoard::new(0b10000001 << (8 * 0)),
-            black_rooks:   BitBoard::new(0b10000001 << (8 * 7)),
-            white_queens:  BitBoard::new(0b00010000 << (8 * 0)),
-            black_queens:  BitBoard::new(0b00010000 << (8 * 7)),
-            white_kings:   BitBoard::new(0b00001000 << (8 * 0)),
-            black_kings:   BitBoard::new(0b00001000 << (8 * 7)),
+        let mut state = HashMap::new();
+        for bitboard_type in BitBoardType::iter() {
+            let bitboard = BitBoard::default_from_type(&bitboard_type);
+            state.insert(bitboard_type, bitboard);
         }
+
+        BitBoardState { state }
     }
 }
 
