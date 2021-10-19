@@ -60,6 +60,7 @@ impl BitBoard
 {
     pub fn new(bits: u64) -> Self { BitBoard { bits } }
     pub fn empty() -> Self { Self::new(0) }
+
     pub fn default_from_type(bitboard_type: &BitBoardType) -> Self
     {
         let bits: u64 = match bitboard_type {
@@ -78,5 +79,58 @@ impl BitBoard
         };
 
         BitBoard::new(bits)
+    }
+
+    pub fn into_piece_array(&self, piece: Piece) -> [Option<Piece>; 64]
+    {
+        let mut pieces = [None; 64];
+        let mut bits = self.bits;
+
+        for i in 0..64 {
+            if bits & 1 == 1 {
+                pieces[i] = Some(piece);
+            }
+            bits <<= 1;
+        }
+
+        pieces
+    }
+}
+
+#[cfg(test)]
+mod tests
+{
+    use std::str::FromStr;
+
+    use strum::IntoEnumIterator;
+
+    use crate::bitboard::{BitBoard, BitBoardType};
+    use crate::piece::Color::*;
+    use crate::piece::Piece;
+    use crate::piece::PieceType::*;
+
+    #[test]
+    fn test_empty_bitboard_returns_no_pieces_in_array()
+    {
+        let array = BitBoard::empty()
+            .into_piece_array(Piece { color: White, piece: Pawn });
+
+        for piece in array.iter() {
+            assert!(piece.is_none())
+        }
+    }
+
+    #[test]
+    fn test_bitboard_returns_correct_pieces_in_array()
+    {
+        let white_bishop = Piece { color: White, piece: Bishop };
+
+        let array = BitBoard::new(0b00100100).into_piece_array(white_bishop);
+
+        assert_eq!(array[2], Some(white_bishop));
+        assert_eq!(array[5], Some(white_bishop));
+        assert_eq!(array[6], None);
+        assert_eq!(array[4], None);
+        assert_eq!(array[0], None);
     }
 }

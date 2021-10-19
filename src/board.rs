@@ -56,14 +56,15 @@ impl GameState for BitBoardState
                 WhitePawns | WhiteKnights | WhiteBishops | WhiteRooks
                 | WhiteQueens | WhiteKings | BlackPawns | BlackKnights
                 | BlackBishops | BlackRooks | BlackQueens | BlackKings => {
-                    let mut bits = bitboard.bits;
-                    for i in 0..64 {
-                        if bits & 1 == 1 {
-                            pieces[i] =
-                                Some(bitboard_type.get_piece().unwrap());
-                        }
-                        bits <<= 1;
-                    }
+                    bitboard
+                        .into_piece_array(bitboard_type.get_piece().unwrap())
+                        .iter()
+                        .enumerate()
+                        .map(|(i, piece)| {
+                            if let Some(_) = piece {
+                                pieces[i] = *piece
+                            }
+                        });
                 },
                 _ => (),
             }
