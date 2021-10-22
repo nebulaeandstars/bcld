@@ -30,13 +30,10 @@ impl FromStr for Square
         }
 
         let mut s = s.chars();
-        let file = s.next().unwrap();
-        let rank = s.next().unwrap();
+        let file = s.next().unwrap() as u8 - b'a' + 1;
+        let rank = s.next().unwrap() as u8 - b'1' + 1;
 
-        Ok(Square {
-            file: (file as u8 - 'a' as u8 + 1),
-            rank: (rank as u8 - '1' as u8 + 1),
-        })
+        Ok(Square { file, rank })
     }
 }
 
@@ -55,10 +52,22 @@ impl FromStr for CastleAvailability
 
         for c in s.chars() {
             let result: Result<(), Self::Err> = match c {
-                'K' => Ok(out.white.0 = true),
-                'Q' => Ok(out.white.1 = true),
-                'k' => Ok(out.black.0 = true),
-                'q' => Ok(out.black.1 = true),
+                'K' => {
+                    out.white.0 = true;
+                    Ok(())
+                },
+                'Q' => {
+                    out.white.1 = true;
+                    Ok(())
+                },
+                'k' => {
+                    out.black.0 = true;
+                    Ok(())
+                },
+                'q' => {
+                    out.black.1 = true;
+                    Ok(())
+                },
                 _ =>
                     Err(format!("unknown symbol {} in castle availability!", c)
                         .into()),
@@ -77,7 +86,7 @@ impl std::fmt::Display for Square
         write!(
             f,
             "{}{}",
-            char::from_u32((self.file + 'a' as u8 - 1) as u32).unwrap(),
+            char::from_u32((self.file + b'a' - 1) as u32).unwrap(),
             self.rank
         )
     }

@@ -1,5 +1,4 @@
 use std::error::Error;
-use std::str::FromStr;
 
 use strum::Display;
 /// Refer to https://en.wikipedia.org/wiki/Bitboard

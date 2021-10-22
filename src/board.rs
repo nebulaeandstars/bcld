@@ -183,32 +183,28 @@ impl FromStr for BitBoardState
     {
         let mut fen = s.split_whitespace();
 
-        let pieces =
-            fen.next().ok_or_else(|| "could not find pieces in fen!")?;
+        let pieces = fen.next().ok_or("could not find pieces in fen!")?;
 
-        let turn = Color::from_str(
-            fen.next().ok_or_else(|| "could not find turn in fen!")?,
+        let turn =
+            Color::from_str(fen.next().ok_or("could not find turn in fen!")?)?;
+
+        let castle_availability = CastleAvailability::from_str(
+            fen.next().ok_or("could not find castle availability in fen!")?,
         )?;
 
-        let castle_availability =
-            CastleAvailability::from_str(fen.next().ok_or_else(|| {
-                "could not find castle availability in fen!"
-            })?)?;
-
         let en_passant_target = Square::from_str(
-            fen.next()
-                .ok_or_else(|| "could not find en passant target in fen!")?,
+            fen.next().ok_or("could not find en passant target in fen!")?,
         )
         .ok();
 
         let halfmove_clock = fen
             .next()
-            .ok_or_else(|| "could not find halfmove clock in fen!")?
+            .ok_or("could not find halfmove clock in fen!")?
             .parse::<u8>()?;
 
         let move_number = fen
             .next()
-            .ok_or_else(|| "could not find move number in fen!")?
+            .ok_or("could not find move number in fen!")?
             .parse::<u16>()?;
 
         let mut i: u8 = 0;
@@ -218,17 +214,15 @@ impl FromStr for BitBoardState
                 continue;
             }
             else if piece.is_numeric() {
-                i += piece as u8 - '0' as u8;
+                i += piece as u8 - b'0';
                 continue;
             }
             else {
                 let bitboard_type =
                     BitBoardType::from(Piece::from_str(&piece.to_string())?);
 
-                if !state.contains_key(&bitboard_type) {
-                    state.insert(bitboard_type, BitBoard::empty());
-                }
-                let bitboard = state.get_mut(&bitboard_type).unwrap();
+                let bitboard =
+                    state.entry(bitboard_type).or_insert_with(BitBoard::empty);
 
                 let file = i % 8;
                 let rank = 7 - (i / 8);
