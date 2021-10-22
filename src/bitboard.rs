@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::str::FromStr;
 
 use strum::Display;
 /// Refer to https://en.wikipedia.org/wiki/Bitboard
@@ -9,7 +10,7 @@ use crate::piece::Color::*;
 use crate::piece::Piece;
 use crate::piece::PieceType::*;
 
-#[derive(EnumIter, Display, Hash, PartialEq, Eq)]
+#[derive(EnumIter, Display, Hash, PartialEq, Eq, Clone, Copy)]
 pub enum BitBoardType
 {
     WhitePawns,
@@ -47,6 +48,27 @@ impl BitBoardType
             _ =>
                 Err(format!("BitBoardType {} has no associated Piece!", &self)
                     .into()),
+        }
+    }
+}
+
+impl From<Piece> for BitBoardType
+{
+    fn from(piece: Piece) -> Self
+    {
+        match piece {
+            Piece { color: White, piece: Pawn } => WhitePawns,
+            Piece { color: White, piece: Knight } => WhiteKnights,
+            Piece { color: White, piece: Bishop } => WhiteBishops,
+            Piece { color: White, piece: Rook } => WhiteRooks,
+            Piece { color: White, piece: Queen } => WhiteQueens,
+            Piece { color: White, piece: King } => WhiteKings,
+            Piece { color: Black, piece: Pawn } => BlackPawns,
+            Piece { color: Black, piece: Knight } => BlackKnights,
+            Piece { color: Black, piece: Bishop } => BlackBishops,
+            Piece { color: Black, piece: Rook } => BlackRooks,
+            Piece { color: Black, piece: Queen } => BlackQueens,
+            Piece { color: Black, piece: King } => BlackKings,
         }
     }
 }

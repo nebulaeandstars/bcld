@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fmt;
+use std::str::FromStr;
 
 use strum::IntoEnumIterator;
 
@@ -174,6 +175,81 @@ impl fmt::Display for BitBoardState
     }
 }
 
+impl FromStr for BitBoardState
+{
+    type Err = Box<dyn std::error::Error>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err>
+    {
+        let mut fen = s.split_whitespace();
+
+        let pieces =
+            fen.next().ok_or_else(|| "could not find pieces in fen!")?;
+
+        let turn = Color::from_str(
+            fen.next().ok_or_else(|| "could not find turn in fen!")?,
+        )?;
+
+        let castle_availability =
+            CastleAvailability::from_str(fen.next().ok_or_else(|| {
+                "could not find castle availability in fen!"
+            })?)?;
+
+        let en_passant_target = Square::from_str(
+            fen.next()
+                .ok_or_else(|| "could not find en passant target in fen!")?,
+        )
+        .ok();
+
+        let halfmove_clock = fen
+            .next()
+            .ok_or_else(|| "could not find halfmove clock in fen!")?
+            .parse::<u8>()?;
+
+        let move_number = fen
+            .next()
+            .ok_or_else(|| "could not find move number in fen!")?
+            .parse::<u16>()?;
+
+        let mut i: u8 = 0;
+        let mut state: HashMap<BitBoardType, BitBoard> = HashMap::new();
+        for piece in pieces.chars() {
+            if piece == '/' {
+                continue;
+            }
+            else if piece.is_numeric() {
+                i += piece as u8 - '0' as u8;
+                continue;
+            }
+            else {
+                let bitboard_type =
+                    BitBoardType::from(Piece::from_str(&piece.to_string())?);
+
+                if !state.contains_key(&bitboard_type) {
+                    state.insert(bitboard_type, BitBoard::empty());
+                }
+                let bitboard = state.get_mut(&bitboard_type).unwrap();
+
+                let file = i % 8;
+                let rank = 7 - (i / 8);
+
+                let square_index = rank * 8 + file;
+                bitboard.bits |= 1 << square_index;
+
+                i += 1;
+            }
+        }
+
+        Ok(Self {
+            state,
+            turn,
+            castle_availability,
+            en_passant_target,
+            halfmove_clock,
+            move_number,
+        })
+    }
+}
 
 #[cfg(test)]
 mod tests
@@ -246,5 +322,19 @@ mod tests
         let target = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
         assert_eq!(format!("{}", board.as_fen()), target.to_string())
+    }
+
+    #[test]
+    fn test_bitboard_state_from_fen()
+    {
+        let tests = vec![
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+            "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+        ];
+
+        for test in tests {
+            let board = BitBoardState::from_str(test).unwrap();
+            assert_eq!(format!("{}", board.as_fen()), test.to_string())
+        }
     }
 }
