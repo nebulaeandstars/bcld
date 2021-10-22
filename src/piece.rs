@@ -1,7 +1,7 @@
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Color
 {
     White,
@@ -76,6 +76,20 @@ impl fmt::Display for Color
     }
 }
 
+impl FromStr for Color
+{
+    type Err = Box<dyn std::error::Error>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err>
+    {
+        match s.to_lowercase().as_str() {
+            "w" => Ok(Self::White),
+            "b" => Ok(Self::Black),
+            _ => Err(format!("{} is not a valid color!", s).into()),
+        }
+    }
+}
+
 impl fmt::Display for PieceType
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
@@ -119,7 +133,7 @@ mod tests
 {
     use std::str::FromStr;
 
-    use super::Color::*;
+    use super::Color::{self, *};
     use super::Piece;
     use super::PieceType::*;
 
@@ -161,5 +175,14 @@ mod tests
             color: White,
             piece: King,
         });
+    }
+
+    #[test]
+    fn test_color_from_string()
+    {
+        assert_eq!(Color::from_str("w").unwrap(), White);
+        assert_eq!(Color::from_str("b").unwrap(), Black);
+        assert!(Color::from_str("invalid_color").is_err());
+        assert!(Color::from_str("").is_err());
     }
 }
