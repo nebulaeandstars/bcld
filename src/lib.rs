@@ -18,6 +18,28 @@ pub struct CastleAvailability
     black: (bool, bool),
 }
 
+
+impl FromStr for Square
+{
+    type Err = Box<dyn std::error::Error>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err>
+    {
+        if s.len() != 2 {
+            return Err(format!("invalid square {}!", s).into());
+        }
+
+        let mut s = s.chars();
+        let file = s.next().unwrap();
+        let rank = s.next().unwrap();
+
+        Ok(Square {
+            file: (file as u8 - 'a' as u8 + 1),
+            rank: (rank as u8 - '1' as u8 + 1),
+        })
+    }
+}
+
 impl FromStr for CastleAvailability
 {
     type Err = Box<dyn std::error::Error>;
@@ -45,16 +67,6 @@ impl FromStr for CastleAvailability
         }
 
         Ok(out)
-    }
-}
-
-impl FromStr for Square
-{
-    type Err = Box<dyn std::error::Error>;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err>
-    {
-        unimplemented!();
     }
 }
 
@@ -143,5 +155,18 @@ mod tests
         assert_eq!(Square { file: 8, rank: 8 }.to_string(), "h8");
         assert_eq!(Square { file: 5, rank: 2 }.to_string(), "e2");
         assert_eq!(Square { file: 1, rank: 1 }.to_string(), "a1");
+    }
+
+    #[test]
+    fn test_square_from_string()
+    {
+        let tests = vec!["e4", "c5", "a4", "g7", "b3"];
+
+        for test in tests {
+            assert_eq!(Square::from_str(test).unwrap().to_string(), test)
+        }
+
+        assert!(Square::from_str("invalid").is_err());
+        assert!(Square::from_str("").is_err())
     }
 }
