@@ -58,6 +58,19 @@ impl FromStr for Square
     }
 }
 
+impl std::fmt::Display for Square
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
+    {
+        write!(
+            f,
+            "{}{}",
+            char::from_u32((self.file + 'a' as u8 - 1) as u32).unwrap(),
+            self.rank
+        )
+    }
+}
+
 impl std::fmt::Display for CastleAvailability
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
@@ -92,17 +105,6 @@ impl Default for CastleAvailability
     }
 }
 
-impl std::fmt::Display for Square
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
-    {
-        let mut out = String::new();
-        out.push('-');
-
-        write!(f, "{}", out)
-    }
-}
-
 pub fn run()
 {
     let board = BitBoardState::start_of_game();
@@ -115,7 +117,7 @@ mod tests
 {
     use std::str::FromStr;
 
-    use super::CastleAvailability;
+    use super::{CastleAvailability, Square};
 
     #[test]
     fn test_castle_availability_from_string()
@@ -131,5 +133,15 @@ mod tests
 
         assert!(CastleAvailability::from_str("invalid").is_err());
         assert!(CastleAvailability::from_str("KQKQKQ").is_err())
+    }
+
+    #[test]
+    fn test_square_to_string()
+    {
+        assert_eq!(Square { file: 5, rank: 4 }.to_string(), "e4");
+        assert_eq!(Square { file: 3, rank: 4 }.to_string(), "c4");
+        assert_eq!(Square { file: 8, rank: 8 }.to_string(), "h8");
+        assert_eq!(Square { file: 5, rank: 2 }.to_string(), "e2");
+        assert_eq!(Square { file: 1, rank: 1 }.to_string(), "a1");
     }
 }
