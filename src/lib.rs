@@ -1,10 +1,12 @@
 mod bitboard;
 mod board;
+mod display;
 mod piece;
 
 use std::str::FromStr;
 
 use board::{BitBoardState, GameState};
+use display::*;
 
 pub struct Square
 {
@@ -130,7 +132,7 @@ pub fn run()
 {
     let board = BitBoardState::start_of_game();
 
-    println!("{}", board);
+    println!("{}", convert_to_chess_pieces(&board.to_string()));
 }
 
 #[cfg(test)]
