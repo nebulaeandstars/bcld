@@ -14,12 +14,13 @@ pub trait GameState
 {
     fn new() -> Self;
     fn start_of_game() -> Self;
+    fn from_fen(s: &str) -> Result<Box<Self>, Box<dyn std::error::Error>>;
+
     fn as_piece_array(&self) -> [Option<Piece>; 64];
     fn as_fen(&self) -> String;
 }
 
 /// A collection of BitBoards representing a full game state.
-#[allow(dead_code)]
 pub struct BitBoardState
 {
     state:               HashMap<BitBoardType, BitBoard>,
@@ -127,59 +128,8 @@ impl GameState for BitBoardState
 
         out
     }
-}
 
-impl Default for BitBoardState
-{
-    fn default() -> Self
-    {
-        let mut state = HashMap::new();
-        for bitboard_type in BitBoardType::iter() {
-            let bitboard = BitBoard::default_from_type(&bitboard_type);
-            state.insert(bitboard_type, bitboard);
-        }
-
-        BitBoardState {
-            state,
-            turn: Color::White,
-            en_passant_target: None,
-            castle_availability: CastleAvailability::default(),
-            halfmove_clock: 0,
-            move_number: 1,
-        }
-    }
-}
-
-impl fmt::Display for BitBoardState
-{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
-    {
-        let array = self.as_piece_array();
-        let mut out = String::new();
-        let mut tmp = String::new();
-
-        for i in 1..=array.len() {
-            if let Some(piece) = array[i - 1] {
-                tmp.push_str(&format!("{} ", piece));
-            }
-            else {
-                tmp.push_str("  ");
-            }
-            if i % 8 == 0 {
-                out.insert_str(0, &format!("{}\n", tmp));
-                tmp = String::new();
-            }
-        }
-
-        write!(f, "{}", out)
-    }
-}
-
-impl FromStr for BitBoardState
-{
-    type Err = Box<dyn std::error::Error>;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err>
+    fn from_fen(s: &str) -> Result<Box<Self>, Box<dyn std::error::Error>>
     {
         let mut fen = s.split_whitespace();
 
@@ -234,14 +184,60 @@ impl FromStr for BitBoardState
             }
         }
 
-        Ok(Self {
+        Ok(Box::new(Self {
             state,
             turn,
             castle_availability,
             en_passant_target,
             halfmove_clock,
             move_number,
-        })
+        }))
+    }
+}
+
+impl Default for BitBoardState
+{
+    fn default() -> Self
+    {
+        let mut state = HashMap::new();
+        for bitboard_type in BitBoardType::iter() {
+            let bitboard = BitBoard::default_from_type(&bitboard_type);
+            state.insert(bitboard_type, bitboard);
+        }
+
+        BitBoardState {
+            state,
+            turn: Color::White,
+            en_passant_target: None,
+            castle_availability: CastleAvailability::default(),
+            halfmove_clock: 0,
+            move_number: 1,
+        }
+    }
+}
+
+impl fmt::Display for BitBoardState
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
+    {
+        let array = self.as_piece_array();
+        let mut out = String::new();
+        let mut tmp = String::new();
+
+        for i in 1..=array.len() {
+            if let Some(piece) = array[i - 1] {
+                tmp.push_str(&format!("{} ", piece));
+            }
+            else {
+                tmp.push_str("  ");
+            }
+            if i % 8 == 0 {
+                out.insert_str(0, &format!("{}\n", tmp));
+                tmp = String::new();
+            }
+        }
+
+        write!(f, "{}", out)
     }
 }
 
@@ -304,7 +300,15 @@ mod tests
     fn test_board_display()
     {
         let board = BitBoardState::start_of_game();
-        let target = "r n b q k b n r \np p p p p p p p \n                \n                \n                \n                \nP P P P P P P P \nR N B Q K B N R \n";
+        let mut target = String::new();
+        target.push_str("r n b q k b n r \n");
+        target.push_str("p p p p p p p p \n");
+        target.push_str("                \n");
+        target.push_str("                \n");
+        target.push_str("                \n");
+        target.push_str("                \n");
+        target.push_str("P P P P P P P P \n");
+        target.push_str("R N B Q K B N R \n");
 
         assert_eq!(format!("{}", board), target.to_string())
     }
@@ -315,7 +319,7 @@ mod tests
         let board = BitBoardState::start_of_game();
         let target = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-        assert_eq!(format!("{}", board.as_fen()), target.to_string())
+        assert_eq!(board.as_fen(), target.to_string())
     }
 
     #[test]
@@ -327,8 +331,8 @@ mod tests
         ];
 
         for test in tests {
-            let board = BitBoardState::from_str(test).unwrap();
-            assert_eq!(format!("{}", board.as_fen()), test.to_string())
+            let board = BitBoardState::from_fen(test).unwrap();
+            assert_eq!(board.as_fen(), test.to_string())
         }
     }
 }
