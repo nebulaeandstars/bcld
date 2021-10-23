@@ -23,7 +23,7 @@ pub trait GameState
 /// A collection of BitBoards representing a full game state.
 pub struct BitBoardState
 {
-    state:               HashMap<BitBoardType, BitBoard>,
+    state:               Vec<BitBoard>,
     turn:                Color,
     castle_availability: CastleAvailability,
     en_passant_target:   Option<Square>,
@@ -35,22 +35,13 @@ impl BitBoardState {}
 
 impl GameState for BitBoardState
 {
-    fn new() -> Self
-    {
-        let mut state = HashMap::new();
-        for bitboard_type in BitBoardType::iter() {
-            state.insert(bitboard_type, BitBoard::empty(bitboard_type));
-        }
-
-        BitBoardState { state, ..Default::default() }
-    }
+    fn new() -> Self { Self::default() }
 
     fn start_of_game() -> Self
     {
-        let mut state = HashMap::new();
+        let mut state = Vec::new();
         for bitboard_type in BitBoardType::iter() {
-            let bitboard = BitBoard::default_for_type(bitboard_type);
-            state.insert(bitboard_type, bitboard);
+            state.push(BitBoard::default_for_type(bitboard_type));
         }
 
         BitBoardState { state, ..Default::default() }
@@ -60,13 +51,15 @@ impl GameState for BitBoardState
     {
         let mut pieces: [Option<Piece>; 64] = [None; 64];
 
-        for (bitboard_type, bitboard) in self.state.iter() {
-            match bitboard_type {
+        for bitboard in self.state.iter() {
+            match bitboard.board_type {
                 WhitePawns | WhiteKnights | WhiteBishops | WhiteRooks
                 | WhiteQueens | WhiteKings | BlackPawns | BlackKnights
                 | BlackBishops | BlackRooks | BlackQueens | BlackKings => {
                     bitboard
-                        .as_piece_array(bitboard_type.get_piece().unwrap())
+                        .as_piece_array(
+                            bitboard.board_type.get_piece().unwrap(),
+                        )
                         .iter()
                         .enumerate()
                         .for_each(|(i, piece)| {
@@ -184,6 +177,7 @@ impl GameState for BitBoardState
                 i += 1;
             }
         }
+        let state = state.into_values().collect();
 
         Ok(Box::new(Self {
             state,
@@ -200,10 +194,9 @@ impl Default for BitBoardState
 {
     fn default() -> Self
     {
-        let mut state = HashMap::new();
+        let mut state = Vec::new();
         for bitboard_type in BitBoardType::iter() {
-            let bitboard = BitBoard::default_for_type(bitboard_type);
-            state.insert(bitboard_type, bitboard);
+            state.push(BitBoard::empty(bitboard_type));
         }
 
         BitBoardState {
@@ -247,19 +240,16 @@ mod tests
 {
     use std::str::FromStr;
 
-    use strum::IntoEnumIterator;
-
     use super::{BitBoardState, GameState};
-    use crate::bitboard::{BitBoard, BitBoardType};
+    use crate::bitboard::BitBoard;
     use crate::piece::Piece;
 
     #[test]
     fn test_start_of_game_state()
     {
         let state = BitBoardState::start_of_game().state;
-        for bitboard_type in BitBoardType::iter() {
-            let bitboard = state.get(&bitboard_type).unwrap();
-            assert_eq!(*bitboard, BitBoard::default_for_type(bitboard_type))
+        for board in state {
+            assert_eq!(board, BitBoard::default_for_type(board.board_type))
         }
     }
 
