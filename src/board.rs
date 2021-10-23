@@ -39,7 +39,7 @@ impl GameState for BitBoardState
     {
         let mut state = HashMap::new();
         for bitboard_type in BitBoardType::iter() {
-            state.insert(bitboard_type, BitBoard::empty());
+            state.insert(bitboard_type, BitBoard::empty(bitboard_type));
         }
 
         BitBoardState { state, ..Default::default() }
@@ -49,7 +49,7 @@ impl GameState for BitBoardState
     {
         let mut state = HashMap::new();
         for bitboard_type in BitBoardType::iter() {
-            let bitboard = BitBoard::default_from_type(&bitboard_type);
+            let bitboard = BitBoard::default_for_type(bitboard_type);
             state.insert(bitboard_type, bitboard);
         }
 
@@ -171,8 +171,9 @@ impl GameState for BitBoardState
                 let bitboard_type =
                     BitBoardType::from(Piece::from_str(&piece.to_string())?);
 
-                let bitboard =
-                    state.entry(bitboard_type).or_insert_with(BitBoard::empty);
+                let bitboard = state
+                    .entry(bitboard_type)
+                    .or_insert_with(|| BitBoard::empty(bitboard_type));
 
                 let file = i % 8;
                 let rank = 7 - (i / 8);
@@ -201,7 +202,7 @@ impl Default for BitBoardState
     {
         let mut state = HashMap::new();
         for bitboard_type in BitBoardType::iter() {
-            let bitboard = BitBoard::default_from_type(&bitboard_type);
+            let bitboard = BitBoard::default_for_type(bitboard_type);
             state.insert(bitboard_type, bitboard);
         }
 
@@ -258,7 +259,7 @@ mod tests
         let state = BitBoardState::start_of_game().state;
         for bitboard_type in BitBoardType::iter() {
             let bitboard = state.get(&bitboard_type).unwrap();
-            assert_eq!(*bitboard, BitBoard::default_from_type(&bitboard_type))
+            assert_eq!(*bitboard, BitBoard::default_for_type(bitboard_type))
         }
     }
 

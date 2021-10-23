@@ -9,7 +9,8 @@ use crate::piece::Color::*;
 use crate::piece::Piece;
 use crate::piece::PieceType::*;
 
-#[derive(EnumIter, Display, Hash, PartialEq, Eq, Clone, Copy)]
+#[non_exhaustive]
+#[derive(EnumIter, Display, Debug, Hash, PartialEq, Eq, Clone, Copy)]
 pub enum BitBoardType
 {
     WhitePawns,
@@ -75,17 +76,21 @@ impl From<Piece> for BitBoardType
 #[derive(Debug, PartialEq)]
 pub struct BitBoard
 {
-    pub bits: u64,
+    pub board_type: BitBoardType,
+    pub bits:       u64,
 }
 
 impl BitBoard
 {
-    pub fn new(bits: u64) -> Self { BitBoard { bits } }
-    pub fn empty() -> Self { Self::new(0) }
-
-    pub fn default_from_type(bitboard_type: &BitBoardType) -> Self
+    pub fn new(board_type: BitBoardType, bits: u64) -> Self
     {
-        let bits: u64 = match bitboard_type {
+        BitBoard { board_type, bits }
+    }
+    pub fn empty(board_type: BitBoardType) -> Self { Self::new(board_type, 0) }
+
+    pub fn default_for_type(board_type: BitBoardType) -> Self
+    {
+        let bits: u64 = match board_type {
             WhitePawns => 0b11111111 << 8,
             WhiteKnights => 0b01000010,
             WhiteBishops => 0b00100100,
@@ -101,7 +106,7 @@ impl BitBoard
             AllPieces => 0xffff00000000ffff,
         };
 
-        BitBoard::new(bits)
+        BitBoard::new(board_type, bits)
     }
 
     pub fn as_piece_array(&self, piece: Piece) -> [Option<Piece>; 64]
@@ -123,6 +128,7 @@ impl BitBoard
 #[cfg(test)]
 mod tests
 {
+    use super::BitBoardType::*;
     use crate::bitboard::BitBoard;
     use crate::piece::Color::*;
     use crate::piece::Piece;
@@ -131,7 +137,7 @@ mod tests
     #[test]
     fn test_empty_bitboard_returns_no_pieces_in_array()
     {
-        let array = BitBoard::empty()
+        let array = BitBoard::empty(WhitePawns)
             .as_piece_array(Piece { color: White, piece: Pawn });
 
         for piece in array.iter() {
@@ -144,7 +150,8 @@ mod tests
     {
         let white_bishop = Piece { color: White, piece: Bishop };
 
-        let array = BitBoard::new(0b00100100).as_piece_array(white_bishop);
+        let array = BitBoard::new(WhiteBishops, 0b00100100)
+            .as_piece_array(white_bishop);
 
         assert_eq!(array[2], Some(white_bishop));
         assert_eq!(array[5], Some(white_bishop));
