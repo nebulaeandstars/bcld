@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use std::error::Error;
 
 use strum::Display;
@@ -26,30 +27,6 @@ pub enum BitBoardType
     BlackQueens,
     BlackKings,
     AllPieces,
-}
-
-impl BitBoardType
-{
-    pub fn get_piece(&self) -> Result<Piece, Box<dyn Error>>
-    {
-        match &self {
-            WhitePawns => Ok(Piece { color: White, piece: Pawn }),
-            WhiteKnights => Ok(Piece { color: White, piece: Knight }),
-            WhiteBishops => Ok(Piece { color: White, piece: Bishop }),
-            WhiteRooks => Ok(Piece { color: White, piece: Rook }),
-            WhiteQueens => Ok(Piece { color: White, piece: Queen }),
-            WhiteKings => Ok(Piece { color: White, piece: King }),
-            BlackPawns => Ok(Piece { color: Black, piece: Pawn }),
-            BlackKnights => Ok(Piece { color: Black, piece: Knight }),
-            BlackBishops => Ok(Piece { color: Black, piece: Bishop }),
-            BlackRooks => Ok(Piece { color: Black, piece: Rook }),
-            BlackQueens => Ok(Piece { color: Black, piece: Queen }),
-            BlackKings => Ok(Piece { color: Black, piece: King }),
-            _ =>
-                Err(format!("BitBoardType {} has no associated Piece!", &self)
-                    .into()),
-        }
-    }
 }
 
 impl From<Piece> for BitBoardType
@@ -109,8 +86,11 @@ impl BitBoard
         BitBoard::new(board_type, bits)
     }
 
-    pub fn as_piece_array(&self, piece: Piece) -> [Option<Piece>; 64]
+    pub fn as_piece_array(&self)
+        -> Result<[Option<Piece>; 64], Box<dyn Error>>
     {
+        let piece = Piece::try_from(self.board_type)?;
+
         let mut pieces = [None; 64];
         let mut bits = self.bits;
 
@@ -121,7 +101,7 @@ impl BitBoard
             bits >>= 1;
         }
 
-        pieces
+        Ok(pieces)
     }
 }
 
@@ -137,8 +117,7 @@ mod tests
     #[test]
     fn test_empty_bitboard_returns_no_pieces_in_array()
     {
-        let array = BitBoard::empty(WhitePawns)
-            .as_piece_array(Piece { color: White, piece: Pawn });
+        let array = BitBoard::empty(WhitePawns).as_piece_array().unwrap();
 
         for piece in array.iter() {
             assert!(piece.is_none())
@@ -150,8 +129,8 @@ mod tests
     {
         let white_bishop = Piece { color: White, piece: Bishop };
 
-        let array = BitBoard::new(WhiteBishops, 0b00100100)
-            .as_piece_array(white_bishop);
+        let array =
+            BitBoard::new(WhiteBishops, 0b00100100).as_piece_array().unwrap();
 
         assert_eq!(array[2], Some(white_bishop));
         assert_eq!(array[5], Some(white_bishop));

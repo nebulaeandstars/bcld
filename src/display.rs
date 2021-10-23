@@ -1,7 +1,7 @@
 /// Converts a given string buffer from text to unicode chess pieces.
 pub fn convert_to_chess_pieces(s: &str) -> String
 {
-    let mut out = s.clone().to_string();
+    let mut out = s.to_string();
 
     out = out.replace("P", "♙");
     out = out.replace("N", "♘");

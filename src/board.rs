@@ -4,8 +4,7 @@ use std::str::FromStr;
 
 use strum::IntoEnumIterator;
 
-use crate::bitboard::BitBoard;
-use crate::bitboard::BitBoardType::{self, *};
+use crate::bitboard::{BitBoard, BitBoardType};
 use crate::piece::{Color, Piece};
 use crate::{CastleAvailability, Square};
 
@@ -52,23 +51,12 @@ impl GameState for BitBoardState
         let mut pieces: [Option<Piece>; 64] = [None; 64];
 
         for bitboard in self.state.iter() {
-            match bitboard.board_type {
-                WhitePawns | WhiteKnights | WhiteBishops | WhiteRooks
-                | WhiteQueens | WhiteKings | BlackPawns | BlackKnights
-                | BlackBishops | BlackRooks | BlackQueens | BlackKings => {
-                    bitboard
-                        .as_piece_array(
-                            bitboard.board_type.get_piece().unwrap(),
-                        )
-                        .iter()
-                        .enumerate()
-                        .for_each(|(i, piece)| {
-                            if piece.is_some() {
-                                pieces[i] = *piece
-                            }
-                        });
-                },
-                _ => (),
+            if let Ok(array) = bitboard.as_piece_array() {
+                array.iter().enumerate().for_each(|(i, piece)| {
+                    if piece.is_some() {
+                        pieces[i] = *piece
+                    }
+                });
             }
         }
 

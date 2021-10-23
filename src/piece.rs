@@ -1,6 +1,8 @@
 use std::fmt;
 use std::str::FromStr;
 
+use crate::bitboard::BitBoardType;
+
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Color
 {
@@ -86,6 +88,38 @@ impl FromStr for Color
             "w" => Ok(Self::White),
             "b" => Ok(Self::Black),
             _ => Err(format!("{} is not a valid color!", s).into()),
+        }
+    }
+}
+
+impl std::convert::TryFrom<BitBoardType> for Piece
+{
+    type Error = Box<dyn std::error::Error>;
+
+    fn try_from(board_type: BitBoardType) -> Result<Self, Self::Error>
+    {
+        use BitBoardType::*;
+        use Color::*;
+        use PieceType::*;
+
+        match &board_type {
+            WhitePawns => Ok(Piece { color: White, piece: Pawn }),
+            WhiteKnights => Ok(Piece { color: White, piece: Knight }),
+            WhiteBishops => Ok(Piece { color: White, piece: Bishop }),
+            WhiteRooks => Ok(Piece { color: White, piece: Rook }),
+            WhiteQueens => Ok(Piece { color: White, piece: Queen }),
+            WhiteKings => Ok(Piece { color: White, piece: King }),
+            BlackPawns => Ok(Piece { color: Black, piece: Pawn }),
+            BlackKnights => Ok(Piece { color: Black, piece: Knight }),
+            BlackBishops => Ok(Piece { color: Black, piece: Bishop }),
+            BlackRooks => Ok(Piece { color: Black, piece: Rook }),
+            BlackQueens => Ok(Piece { color: Black, piece: Queen }),
+            BlackKings => Ok(Piece { color: Black, piece: King }),
+            _ => Err(format!(
+                "BitBoardType {} has no associated Piece!",
+                &board_type
+            )
+            .into()),
         }
     }
 }
