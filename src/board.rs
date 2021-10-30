@@ -246,28 +246,18 @@ mod tests
     {
         let array = BitBoardState::start_of_game().as_piece_array();
 
-        let white_pawn = Piece::from_str("P").unwrap();
-        let white_knight = Piece::from_str("N").unwrap();
-        let white_rook = Piece::from_str("R").unwrap();
-        let white_king = Piece::from_str("K").unwrap();
-        let black_pawn = Piece::from_str("p").unwrap();
-        let black_rook = Piece::from_str("r").unwrap();
-        let black_bishop = Piece::from_str("b").unwrap();
-        let black_queen = Piece::from_str("q").unwrap();
-
-        assert_eq!(array[0], Some(white_rook));
-        assert_eq!(array[7], Some(white_rook));
-        assert_eq!(array[8], Some(white_pawn));
-        assert_eq!(array[15], Some(white_pawn));
-        assert_eq!(array[63], Some(black_rook));
-        assert_eq!(array[56], Some(black_rook));
-        assert_eq!(array[55], Some(black_pawn));
-        assert_eq!(array[48], Some(black_pawn));
-
-        assert_eq!(array[4], Some(white_king));
-        assert_eq!(array[59], Some(black_queen));
-        assert_eq!(array[1], Some(white_knight));
-        assert_eq!(array[61], Some(black_bishop));
+        assert_eq!(array[0], Piece::from_str("R").ok());
+        assert_eq!(array[7], Piece::from_str("R").ok());
+        assert_eq!(array[56], Piece::from_str("r").ok());
+        assert_eq!(array[63], Piece::from_str("r").ok());
+        assert_eq!(array[8], Piece::from_str("P").ok());
+        assert_eq!(array[15], Piece::from_str("P").ok());
+        assert_eq!(array[48], Piece::from_str("p").ok());
+        assert_eq!(array[55], Piece::from_str("p").ok());
+        assert_eq!(array[4], Piece::from_str("K").ok());
+        assert_eq!(array[3], Piece::from_str("Q").ok());
+        assert_eq!(array[60], Piece::from_str("k").ok());
+        assert_eq!(array[59], Piece::from_str("q").ok());
 
         assert_eq!(array[16], None);
         assert_eq!(array[47], None);
